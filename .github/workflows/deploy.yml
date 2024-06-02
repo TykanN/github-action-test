@@ -1,14 +1,27 @@
+# 워크플로우의 이름
 name: Github Actions 실행시켜보기
 
+# 트리거 조건
 on:
   push:
     branches:
       - main
 
+# 1 워크플로우 - 여러 Job을 포함할 수 있다.
+# 여러 Job은 기본적으로 병렬적으로 수행된다.
 jobs:
+  # Job의 고유 이름
   My-Deploy-Job:
+    # 운영체제
     runs-on: ubuntu-latest
 
+    # Step: 특정 작업을 수행하는 가장 작은 단위
+    # Workflow - Job - Step
     steps:
       - name: Hello World 찍기
         run: echo "Hello World"
+
+      - name: 명령어 여러개 실행하기
+        run: |
+          echo "Good"
+          echo "Morning"
