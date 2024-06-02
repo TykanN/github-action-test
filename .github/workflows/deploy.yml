@@ -30,3 +30,8 @@ jobs:
         run: |
           echo $GITHUB_SHA
           echo $GITHUB_REPOSITORY
+
+      - name: sceret 값 사용하기
+        run: |
+          echo ${{ secrets.MY_NAME }}
+          echo ${{ secrets.MY_HOBBY }}
