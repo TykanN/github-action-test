@@ -63,22 +63,23 @@ jobs:
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           source: spring_demo/project.jar
           target: /home/ubuntu/spring_server/tobe
-#      - name: SSH로 EC2 접속
-#        uses: appleboy/ssh-action@master
-#        with:
-#          host: ${{ secrets.EC2_HOST }}
-#          username: ${{ secrets.EC2_USERNAME }}
-#          key: ${{ secrets.EC2_PRIVATE_KEY }}
-#          script_stop: true
-#          script: |
-#            rm -rf /home/ubuntu/spring_server/current
-#            mkdir /home/ubuntu/spring_server/current
-#            mv /home/ubuntu/spring_server/tobe/project.jar /home/ubuntu/spring_server/current/project.jar
-#            cd /home/ubuntu/spring_server/current
-#            sudo fuser -k -n tcp 8080 || true
-#            nohup java -jar project.jar > ./output.log 2>&1 &
-#            rm -rf /home/ubuntu/spring_server/tobe
-#            echo "Deploy Success"
+          strip_components: 1 #파일 경로를 몇 단계까지 제거할 것인지
+      - name: SSH로 EC2 접속
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_PRIVATE_KEY }}
+          script_stop: true
+          script: |
+            rm -rf /home/ubuntu/spring_server/current
+            mkdir /home/ubuntu/spring_server/current
+            mv /home/ubuntu/spring_server/tobe/project.jar /home/ubuntu/spring_server/current/project.jar
+            cd /home/ubuntu/spring_server/current
+            sudo fuser -k -n tcp 8080 || true
+            nohup java -jar project.jar > ./output.log 2>&1 &
+            rm -rf /home/ubuntu/spring_server/tobe
+            echo "Deploy Success"
       # SSH
 #      - name: SSH로 EC2 접속
 #        uses: appleboy/ssh-action@master
