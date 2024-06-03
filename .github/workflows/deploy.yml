@@ -38,6 +38,9 @@ jobs:
 
   Spring-Deploy:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: spring_server
     steps:
       - name: Github Repository에 올린 파일들을 불러오기
         uses: actions/checkout@v4
@@ -51,7 +54,7 @@ jobs:
           cd spring_demo
           echo "${{ secrets.APPLICATION_PROPERTIES }}" > src/main/resources/application.yml
       - name: 테스트 및 빌드
-        run: gradlew clean build
+        run: ./gradlew clean build
       - name: 빌드 파일 이름 변경
         run: mv build/libs/*SNAPSHOT.jar ./project.jar
       - name: SCP로 EC2로 파일 전송
