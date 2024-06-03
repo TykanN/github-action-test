@@ -36,5 +36,23 @@ jobs:
           echo ${{ secrets.MY_NAME }}
           echo ${{ secrets.MY_HOBBY }}
 
-#  Spring-Deploy:
-#    runs-on: ubuntu-latest
+  Spring-Deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: SSH로 EC2 접속
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_PRIVATE_KEY }}
+          script: |
+            cd /home/ubuntu/github-action-test
+            git pull origin main
+            cd /spring-demo
+            ./gradlew clean build
+            sudo fuser -k -n tcp 8080 || true
+            nohup java -jar build/libs/*SNAPSHOT.jar > .output.log 2>&1 &
+      - name: Checkout 소스코드
+        uses: actions/checkout@v3
+      - name: 빌드하기
+        run: ./gradlew clean build
