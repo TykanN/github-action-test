@@ -36,18 +36,5 @@ jobs:
           echo ${{ secrets.MY_NAME }}
           echo ${{ secrets.MY_HOBBY }}
 
-  Spring-Deploy:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout 소스코드
-        uses: actions/checkout@v2
-
-      - name: 빌드하기
-        run: ./gradlew build
-
-      - name: 테스트하기
-        run: ./gradlew test
-
-      - name: 배포하기
-        run: echo "배포 완료"
+#  Spring-Deploy:
+#    runs-on: ubuntu-latest
