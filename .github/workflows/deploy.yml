@@ -48,7 +48,7 @@ jobs:
           script: |
             cd /home/ubuntu/github-action-test
             sudo git pull origin main
-            cd /spring-demo
+            cd spring_demo
             ./gradlew clean build
             sudo fuser -k -n tcp 8080 || true
             nohup java -jar build/libs/*SNAPSHOT.jar > .output.log 2>&1 &
