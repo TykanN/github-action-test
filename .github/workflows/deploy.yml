@@ -53,9 +53,8 @@ jobs:
         run: ./gradlew clean build
         working-directory: spring_demo
       - name: 빌드 파일 이름 변경
-        run: mv build/libs/*SNAPSHOT.jar ./project.jar
+        run: mv build/libs/*SNAPSHOT.jar ../project.jar
         working-directory: spring_demo
-
       - name: S3로 전송위해 압축하기
         run: tar -czvf ${{ github.sha }}.tar.gz project.jar appspec.yml scripts
       - name: AWS credential 설정
