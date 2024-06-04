@@ -55,32 +55,51 @@ jobs:
       - name: 빌드 파일 이름 변경
         run: mv build/libs/*SNAPSHOT.jar ./project.jar
         working-directory: spring_demo
-      - name: SCP로 EC2로 파일 전송
-        uses: appleboy/scp-action@master
+
+      - name: S3로 전송위해 압축하기
+        run: tar -czvf ${{ github.sha }}.tar.gz project.jar appspec.yml scripts
+      - name: AWS credential 설정
+        uses: aws-actions/configure-aws-credentials@v4
         with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USERNAME }}
-          key: ${{ secrets.EC2_PRIVATE_KEY }}
-          source: spring_demo/project.jar
-          target: /home/ubuntu/spring_server/tobe
-          strip_components: 1 #파일 경로를 몇 단계까지 제거할 것인지
-      - name: SSH로 EC2 접속
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USERNAME }}
-          key: ${{ secrets.EC2_PRIVATE_KEY }}
-          script_stop: true
-          script: |
-            rm -rf /home/ubuntu/spring_server/current
-            mkdir /home/ubuntu/spring_server/current
-            mv /home/ubuntu/spring_server/tobe/project.jar /home/ubuntu/spring_server/current/project.jar
-            cd /home/ubuntu/spring_server/current
-            sudo fuser -k -n tcp 8080 || true
-            nohup java -jar project.jar > ./output.log 2>&1 &
-            rm -rf /home/ubuntu/spring_server/tobe
-            echo "Deploy Success"
-      # SSH
+          aws-region: ap-northeast-2
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      - name: S3로 파일 전송
+        run: aws s3 cp --region ap-northeast-2 ./${{ github.sha }}.tar.gz s3://instagram-deploy-bucket/${{ github.sha }}.tar.gz
+      - name: CodeDeploy 배포 시작
+        run: aws deploy create-deploymen
+          --region ap-northeast-2
+          --application-name instagram-server-deploy
+          --deployment-config-name CodeDeployDefault.AllAtOnce
+          --deployment-group-name Production
+          --s3-location bucket=instagram-deploy-bucket,bundleType=tgz,key=${{ github.sha }}.tar.gz
+      # jar파일 전송해서 SSH로 직접 배포 스크립트
+#      - name: SCP로 EC2로 파일 전송
+#        uses: appleboy/scp-action@master
+#        with:
+#          host: ${{ secrets.EC2_HOST }}
+#          username: ${{ secrets.EC2_USERNAME }}
+#          key: ${{ secrets.EC2_PRIVATE_KEY }}
+#          source: spring_demo/project.jar
+#          target: /home/ubuntu/spring_server/tobe
+#          strip_components: 1 #파일 경로를 몇 단계까지 제거할 것인지
+#      - name: SSH로 EC2 접속
+#        uses: appleboy/ssh-action@master
+#        with:
+#          host: ${{ secrets.EC2_HOST }}
+#          username: ${{ secrets.EC2_USERNAME }}
+#          key: ${{ secrets.EC2_PRIVATE_KEY }}
+#          script_stop: true
+#          script: |
+#            rm -rf /home/ubuntu/spring_server/current
+#            mkdir /home/ubuntu/spring_server/current
+#            mv /home/ubuntu/spring_server/tobe/project.jar /home/ubuntu/spring_server/current/project.jar
+#            cd /home/ubuntu/spring_server/current
+#            sudo fuser -k -n tcp 8080 || true
+#            nohup java -jar project.jar > ./output.log 2>&1 &
+#            rm -rf /home/ubuntu/spring_server/tobe
+#            echo "Deploy Success"
+      # SSH통해 소스코드 당겨서 직접 빌드 및 배포
 #      - name: SSH로 EC2 접속
 #        uses: appleboy/ssh-action@master
 #        env:
