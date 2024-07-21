@@ -9,5 +9,3 @@ docker rm instagram-server || true
 docker pull 471112870624.dkr.ecr.us-east-1.amazonaws.com/instagram-server:latest
 docker run -d --name instagram-server -p 8080:8080 471112870624.dkr.ecr.us-east-1.amazonaws.com/instagram-server:latest
 echo "--------------- 서버 배포 끝 -----------------"
-
-
