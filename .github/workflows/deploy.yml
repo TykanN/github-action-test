@@ -67,17 +67,17 @@ jobs:
         run: docker tag instagram-server ${{ steps.login-ecr.outputs.registry }}/instagram-server:latest
       - name: ECR에 이미지 푸시
         run: docker push ${{ steps.login-ecr.outputs.registry }}/instagram-server:latest
-      - name: CodeDeploy 관련 파일 압축하기
-        run: tar -czvf ${{ github.sha }}.tar.gz appspec.yml scripts
-      - name: S3로 파일 전송
-        run: aws s3 cp --region ap-northeast-2 ./${{ github.sha }}.tar.gz s3://instagram-deploy-bucket/${{ github.sha }}.tar.gz
-      - name: CodeDeploy 배포 시작
-        run: aws deploy create-deployment
-          --region ap-northeast-2
-          --application-name instagram-server-deploy
-          --deployment-config-name CodeDeployDefault.AllAtOnce
-          --deployment-group-name Production
-          --s3-location bucket=instagram-deploy-bucket,bundleType=tgz,key=${{ github.sha }}.tar.gz
+      # - name: CodeDeploy 관련 파일 압축하기
+      #   run: tar -czvf ${{ github.sha }}.tar.gz appspec.yml scripts
+      # - name: S3로 파일 전송
+      #   run: aws s3 cp --region ap-northeast-2 ./${{ github.sha }}.tar.gz s3://instagram-deploy-bucket/${{ github.sha }}.tar.gz
+      # - name: CodeDeploy 배포 시작
+      #   run: aws deploy create-deployment
+      #     --region ap-northeast-2
+      #     --application-name instagram-server-deploy
+      #     --deployment-config-name CodeDeployDefault.AllAtOnce
+      #     --deployment-group-name Production
+      #     --s3-location bucket=instagram-deploy-bucket,bundleType=tgz,key=${{ github.sha }}.tar.gz
       # SSH로 ECR에 있는 이미지를 EC2로 배포
       # - name: SSH로 EC2 접속
       #   uses: appleboy/ssh-action@master
